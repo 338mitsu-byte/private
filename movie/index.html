@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+  <title>Loop Video</title>
+  <style>
+    /* Reset */
+    html,body {height:100%; margin:0; background:#000;}
+    /* Centering and full-bleed */
+    .video-wrap {
+      position:fixed;
+      inset:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+      background:#000;
+    }
+    video {
+      /* Fill the viewport while preserving aspect ratio.
+         object-fit: cover makes vertical video cover whole screen on both orientations */
+      width:100vw;
+      height:100vh;
+      object-fit:cover;
+      -webkit-user-select:none;
+      user-select:none;
+      touch-action:none;
+    }
+    /* Optional: hide any default controls if shown */
+    video::-webkit-media-controls { display: none !important; }
+  </style>
+</head>
+<body>
+  <div class="video-wrap">
+    <!--
+      Make sure the video file "thankyou02.mp4" is in the same folder as this HTML file
+      Attributes to help autoplay on mobile:
+        autoplay muted loop playsinline webkit-playsinline
+    -->
+    <video id="v" autoplay muted loop playsinline webkit-playsinline preload="auto" tabindex="-1">
+      <source src="thankyou02.mp4" type="video/mp4">
+      お使いのブラウザは video タグをサポートしていません。
+    </video>
+  </div>
+
+  <script>
+    // Try to ensure playback starts on some mobile browsers
+    (function() {
+      const v = document.getElementById('v');
+
+      // Prevent context menu (optional)
+      window.addEventListener('contextmenu', e => e.preventDefault());
+
+      // If the video is paused for any reason, attempt a programmatic play on first interaction
+      function userPlay() {
+        v.play().catch(()=>{});
+        window.removeEventListener('touchstart', userPlay);
+        window.removeEventListener('click', userPlay);
+      }
+      window.addEventListener('touchstart', userPlay, {passive:true});
+      window.addEventListener('click', userPlay, {passive:true});
+
+      // On visibility change, resume playback when visible again
+      document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) v.play().catch(()=>{});
+      });
+
+      // iOS sometimes needs a tiny delay
+      setTimeout(()=>{ v.play().catch(()=>{}); }, 300);
+    })();
+  </script>
+</body>
+</html>
